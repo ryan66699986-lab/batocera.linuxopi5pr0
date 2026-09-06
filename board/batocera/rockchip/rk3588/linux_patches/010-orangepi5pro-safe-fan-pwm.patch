@@ -1,0 +1,26 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+Subject: [PATCH] arm64: dts: rockchip: orangepi-5-pro: use safe 50 Hz fan PWM
+
+The Orange Pi 5 Pro fan control circuit is driven through an RC-filtered
+MOSFET gate.  Armbian's tested Orange Pi 5 Pro hardware-support update uses
+a 20 ms (50 Hz) PWM period rather than the old 50 us period in this vendor
+DTS.  Carry that board-specific electrical fix without changing the RK3588
+vendor multimedia kernel baseline.
+
+Also match the tested board description by supplying the 5 V fan rail and
+avoiding a zero-duty cooling state.
+
+--- a/arch/arm64/boot/dts/rockchip/rk3588s-orangepi-5-pro.dts
++++ b/arch/arm64/boot/dts/rockchip/rk3588s-orangepi-5-pro.dts
+@@ -211,8 +211,9 @@
+ 	fan: pwm-fan {
+ 		compatible = "pwm-fan";
+ 		#cooling-cells = <2>;
+-		pwms = <&pwm2 0 50000 0>;
+-		cooling-levels = <0 50 100 150 200 255>;
++		pwms = <&pwm2 0 20000000 0>;
++		cooling-levels = <160 190 215 235 255>;
++		fan-supply = <&vcc5v0_sys>;
+ 		rockchip,temp-trips = <
+ 			50000   1
+ 			55000   2
